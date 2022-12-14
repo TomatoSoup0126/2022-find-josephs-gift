@@ -11,6 +11,7 @@
     <div class="mx-auto mt-6">
       <ControlPanel
         :step="step"
+        :discardPresents="discardPresents"
         @add="step += 1"
         @subtract="handleSubtract"
         @reset="step = 1"
@@ -22,7 +23,7 @@
         v-for="index in +presentsNumber"
         :key="index"
         :index="index"
-        :discard="!presentsDiscardByStep.includes(index)"
+        :discard="discardPresentsOnStep.includes(index)"
       />
     </div>
   </main>
@@ -40,17 +41,6 @@ const presents = computed(() => {
   return Array.from({ length: +presentsNumber.value }, (_, i) => i + 1)
 })
 
-const presentsDiscardByStep = computed(() => {
-  const array = [...presents.value]
-  let stepTick = 0
-  while (stepTick !== step.value) {
-    stepTick += 1
-    discardPresents(array, stepTick)
-  }
-  return array
-})
-
-
 const handleSubtract = () => {
   if (step.value > 1) {
     step.value -= 1
@@ -58,11 +48,33 @@ const handleSubtract = () => {
 }
 
 const handleToLast = () => {
-  console.log('handleToLast')
+  step.value = discardPresents.value.length
 }
 
-const discardPresents = (array, step) => {
-  console.group('discardPresents', array, step)
-  return array.splice(step > array.length ? Math.round(step / array.length) : step, 1)
-}
+const discardPresents = computed(() => {
+  let array = [...presents.value]
+  let currentStep = 0
+  let offset = Math.round(array.length / 2)
+  const result = []
+
+  while (array.length > 1) {
+    currentStep++
+    const discardGift = array.splice(currentStep, 1)
+    if (discardGift.length) {
+      result.push(...discardGift)
+    } else {
+      if (currentStep - offset >= array.length) {
+        offset = offset + Math.round(array.length / 2) + 1
+        console.log('after:', offset)
+      }
+      const discardGift = array.splice(currentStep - offset, 1)
+      result.push(...discardGift)
+    }
+  }
+  return result
+})
+
+const discardPresentsOnStep = computed(() => {
+  return discardPresents.value.slice(0, step.value)
+})
 </script>

@@ -1,15 +1,15 @@
 <template>
 <div class="flex justify-center">
-  <button @click="handleReset">
+  <button @click="handleReset" :disabled="step === 1" class="disabled:opacity-25">
     <ForwardIcon class="mx-2 rotate-180 h-6 w-6 hover:text-blue-500 transition-colors" />
   </button>
-  <button @click="handleSubtract">
+  <button @click="handleSubtract" :disabled="step === 1" class="disabled:opacity-25">
     <PlayIcon class="mx-2 rotate-180 h-6 w-6 hover:text-blue-500 transition-colors" />
   </button>
-  <button @click="handleAdd">
+  <button @click="handleAdd" :disabled="step === discardPresents.length" class="disabled:opacity-25">
     <PlayIcon class="mx-2 h-6 w-6 hover:text-blue-500 transition-colors" />
   </button>
-  <button @click="handleForward">
+  <button @click="handleForward" :disabled="step === discardPresents.length" class="disabled:opacity-25">
     <ForwardIcon class="mx-2 h-6 w-6 hover:text-blue-500 transition-colors" />
   </button>
 </div>
@@ -23,6 +23,10 @@ const props = defineProps({
   step: {
     type: Number,
     required: true
+  },
+  discardPresents: {
+    type: Array,
+    default: () => ([])
   }
 })
 
